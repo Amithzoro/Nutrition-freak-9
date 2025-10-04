@@ -5,7 +5,7 @@ st.set_page_config(page_title="🥗 Smart Nutrition Calculator", layout="wide")
 st.title("🥦 Smart Nutrition Calculator")
 st.markdown("### Track your meals like a pro — simple, accurate, and fast!")
 
-# --- Food database with cooking types & recipes ---
+# --- Food database with cooking types, recipes & instructions ---
 foods = {
     "Rice": {
         "types": {
@@ -14,14 +14,33 @@ foods = {
             "Steamed": {"calories": 120, "protein": 2.5, "fat": 0.2, "carbs": 26},
         },
         "recipes": [
-            "🍛 Veg Fried Rice (Text): Rice, mixed veggies, soy sauce, olive oil.",
-            "🍋 Lemon Rice (Text): Rice, lemon juice, turmeric, curry leaves.",
-            "🍚 Steamed Rice with Dal (Text): Rice with yellow lentils and ghee.",
-            "🥦 Rice Bowl (Text): Rice, broccoli, tofu, soy dressing.",
-            "▶️ Watch: [Fried Rice Recipe](https://www.youtube.com/watch?v=4hG_NvF7pXY)",
-            "▶️ Watch: [Lemon Rice Recipe](https://www.youtube.com/watch?v=l3ZB8LzQd2M)",
-        ]
+            {
+                "title": "🍛 Veg Fried Rice",
+                "desc": "Rice, mixed veggies, soy sauce, olive oil.",
+                "steps": [
+                    "1️⃣ Heat oil in a wok.",
+                    "2️⃣ Add chopped veggies and stir-fry for 3–4 mins.",
+                    "3️⃣ Add cooked rice and soy sauce.",
+                    "4️⃣ Stir well and serve hot."
+                ],
+            },
+            {
+                "title": "🍋 Lemon Rice",
+                "desc": "Rice, lemon juice, turmeric, curry leaves.",
+                "steps": [
+                    "1️⃣ Heat oil, add mustard seeds and curry leaves.",
+                    "2️⃣ Add turmeric and cooked rice.",
+                    "3️⃣ Mix lemon juice and salt, stir well.",
+                    "4️⃣ Serve with chutney or yogurt."
+                ],
+            },
+            {
+                "title": "▶️ Watch: Fried Rice Video",
+                "link": "https://www.youtube.com/watch?v=4hG_NvF7pXY",
+            },
+        ],
     },
+
     "Chicken Breast": {
         "types": {
             "Grilled": {"calories": 165, "protein": 31, "fat": 3.6, "carbs": 0},
@@ -29,14 +48,32 @@ foods = {
             "Fried": {"calories": 220, "protein": 26, "fat": 11, "carbs": 2},
         },
         "recipes": [
-            "🍗 Grilled Chicken (Text): Marinated with olive oil, lemon, and herbs.",
-            "🍛 Chicken Curry (Text): Chicken, tomato gravy, and spices.",
-            "🥗 Chicken Salad (Text): Grilled chicken, lettuce, cucumber, olive dressing.",
-            "🌮 Chicken Wrap (Text): Chicken breast, veggies, and flatbread.",
-            "▶️ Watch: [Grilled Chicken Recipe](https://www.youtube.com/watch?v=4CjP5v1E5Ew)",
-            "▶️ Watch: [Chicken Curry Recipe](https://www.youtube.com/watch?v=HC8wWZ7bU1Q)",
-        ]
+            {
+                "title": "🍗 Grilled Chicken",
+                "desc": "Marinated with olive oil, lemon, and herbs.",
+                "steps": [
+                    "1️⃣ Marinate chicken with olive oil, salt, pepper, and lemon juice for 30 mins.",
+                    "2️⃣ Preheat grill and cook for 6–8 mins on each side.",
+                    "3️⃣ Let it rest and serve with veggies or salad."
+                ],
+            },
+            {
+                "title": "🍛 Chicken Curry",
+                "desc": "Chicken, tomato gravy, and spices.",
+                "steps": [
+                    "1️⃣ Sauté onions, garlic, and ginger until golden.",
+                    "2️⃣ Add tomatoes and spices, cook till thick.",
+                    "3️⃣ Add chicken pieces and simmer until cooked.",
+                    "4️⃣ Garnish with coriander and serve hot."
+                ],
+            },
+            {
+                "title": "▶️ Watch: Chicken Curry Video",
+                "link": "https://www.youtube.com/watch?v=HC8wWZ7bU1Q",
+            },
+        ],
     },
+
     "Egg": {
         "sizes": {
             "Small": {"calories": 54, "protein": 4.7, "fat": 3.6, "carbs": 0.3},
@@ -50,42 +87,28 @@ foods = {
             "Omelette": 1.2
         },
         "recipes": [
-            "🥚 Egg Sandwich (Text): Boiled eggs, lettuce, tomato, bread.",
-            "🍳 Scrambled Eggs (Text): Beaten eggs cooked in butter.",
-            "🌶 Masala Egg (Text): Boiled eggs sautéed with onions, tomatoes, and chili.",
-            "🥗 Egg Salad (Text): Eggs, Greek yogurt, mustard, pepper.",
-            "🍞 Egg Toast (Text): Egg mixture on toasted bread.",
-            "▶️ Watch: [Egg Sandwich Recipe](https://www.youtube.com/watch?v=zR0RdkM-AxI)",
-            "▶️ Watch: [Masala Egg Recipe](https://www.youtube.com/watch?v=ts53VQyRhDU)",
-        ]
-    },
-    "Paneer": {
-        "types": {
-            "Raw": {"calories": 265, "protein": 18, "fat": 21, "carbs": 2.4},
-            "Grilled": {"calories": 280, "protein": 20, "fat": 22, "carbs": 3},
-            "Fried": {"calories": 320, "protein": 21, "fat": 26, "carbs": 4},
-        },
-        "recipes": [
-            "🧀 Paneer Bhurji (Text): Crumbled paneer with onion, tomato & spices.",
-            "🍢 Paneer Tikka (Text): Marinated paneer grilled with capsicum.",
-            "🥘 Paneer Curry (Text): Paneer cubes in tomato gravy.",
-            "🥗 Paneer Salad (Text): Paneer with cucumber and herbs.",
-            "▶️ Watch: [Paneer Bhurji Recipe](https://www.youtube.com/watch?v=g0o6tR3Yv9Y)",
-            "▶️ Watch: [Paneer Tikka Recipe](https://www.youtube.com/watch?v=fxX4O5UO4jY)",
-        ]
-    },
-    "Oats": {
-        "types": {
-            "Raw": {"calories": 389, "protein": 17, "fat": 7, "carbs": 66},
-            "Cooked": {"calories": 70, "protein": 2.4, "fat": 1.4, "carbs": 12},
-        },
-        "recipes": [
-            "🥣 Oatmeal Bowl (Text): Oats, milk, banana, chia seeds.",
-            "🍪 Oat Cookies (Text): Oats, peanut butter, honey.",
-            "🥛 Oat Smoothie (Text): Oats, milk, apple, and cinnamon.",
-            "🥥 Coconut Oats (Text): Oats cooked with coconut milk and raisins.",
-            "▶️ Watch: [Oatmeal Recipe](https://www.youtube.com/watch?v=Q4x-9XoeV2Y)",
-        ]
+            {
+                "title": "🥚 Boiled Egg",
+                "desc": "Simple boiled egg.",
+                "steps": [
+                    "1️⃣ Place eggs in boiling water for 7–10 minutes.",
+                    "2️⃣ Cool in ice water and peel before serving."
+                ],
+            },
+            {
+                "title": "🍳 Scrambled Eggs",
+                "desc": "Fluffy and delicious scrambled eggs.",
+                "steps": [
+                    "1️⃣ Beat eggs with salt and a splash of milk.",
+                    "2️⃣ Pour into heated pan with butter.",
+                    "3️⃣ Stir gently until fluffy."
+                ],
+            },
+            {
+                "title": "▶️ Watch: Egg Sandwich Video",
+                "link": "https://www.youtube.com/watch?v=zR0RdkM-AxI",
+            },
+        ],
     },
 }
 
@@ -134,16 +157,22 @@ if submit:
     col3.metric("🥑 Fat", f"{fat:.1f} g")
     col4.metric("🍞 Carbs", f"{carbs:.1f} g")
 
-    # --- Recipes ---
+    # --- Recipe Section with clickable instructions ---
     st.markdown("---")
     st.markdown("### 🍽 Recipe Suggestions")
+
     for recipe in foods[food_name].get("recipes", []):
-        st.markdown(f"- {recipe}")
+        if "link" in recipe:
+            st.markdown(f"- [{recipe['title']}]({recipe['link']})")
+        else:
+            with st.expander(recipe["title"] + f" — {recipe['desc']}"):
+                for step in recipe["steps"]:
+                    st.write(step)
 
 else:
     st.info("👈 Choose your food, cooking type, and quantity — then click **Submit**!")
 
-# --- Notes section ---
+# --- Notes Section ---
 st.markdown("---")
 st.markdown("### 🧠 Tip: Consistency is key! Track your meals daily for best results.")
 with st.expander("📖 Add your own note"):
@@ -152,3 +181,4 @@ with st.expander("📖 Add your own note"):
         st.success("Note saved! (In a real app, this could be stored locally or in the cloud.)")
 
 st.caption("Built with ❤️ using Streamlit")
+
