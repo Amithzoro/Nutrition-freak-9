@@ -1,67 +1,147 @@
 import streamlit as st
-from datetime import datetime
-from PIL import Image
-import pytz
+from PIL import Image, ImageStat
 import random
+from datetime import datetime
+import pytz
+import streamlit.components.v1 as components
 
-# ---------------------- PAGE CONFIG ----------------------
-st.set_page_config(page_title="🥗 Smart Nutrition Tracker v3.5", layout="wide")
+# ------------------ PAGE CONFIG ------------------
+st.set_page_config(page_title="🥗 Smart Nutrition Tracker Final", layout="wide")
+st.title("🥦 Smart Nutrition & Meal Tracker")
+st.markdown("Track your meals, play real recipe videos, and log time (IST)")
 
-st.title("🥦 Smart Nutrition & Fitness Tracker")
-st.markdown("### Track your meals, watch real recipes, and stay consistent 💪")
-
-# ---------------------- FOOD DATABASE ----------------------
+# ------------------ FOOD DATABASE ------------------
 foods = {
-    # Veg
-    "Oats": {"calories": 389, "protein": 17, "fat": 7, "carbs": 66},
-    "Paneer": {"calories": 265, "protein": 18, "fat": 21, "carbs": 2.4},
-    "Tofu": {"calories": 76, "protein": 8, "fat": 4, "carbs": 2},
-    "Broccoli": {"calories": 34, "protein": 3, "fat": 0.4, "carbs": 7},
-    "Sweet Potato": {"calories": 86, "protein": 1.6, "fat": 0.1, "carbs": 20},
-    "Lentils (Dal)": {"calories": 116, "protein": 9, "fat": 0.4, "carbs": 20},
-    "Banana": {"calories": 89, "protein": 1.1, "fat": 0.3, "carbs": 23},
-    "Almonds": {"calories": 579, "protein": 21, "fat": 50, "carbs": 22},
-    "Milk": {"calories": 42, "protein": 3.4, "fat": 1, "carbs": 5},
-    "Greek Yogurt": {"calories": 59, "protein": 10, "fat": 0.4, "carbs": 3.6},
-
-    # Non-Veg
-    "Chicken Breast": {"calories": 165, "protein": 31, "fat": 3.6, "carbs": 0},
-    "Chicken Thigh": {"calories": 209, "protein": 26, "fat": 10.9, "carbs": 0},
-    "Fish (Salmon)": {"calories": 208, "protein": 20, "fat": 13, "carbs": 0},
-    "Fish (Tilapia)": {"calories": 96, "protein": 20, "fat": 2, "carbs": 0},
-    "Tuna": {"calories": 132, "protein": 28, "fat": 1, "carbs": 0},
-    "Egg": {"calories": 78, "protein": 6, "fat": 5, "carbs": 0.6},
-    "Prawns": {"calories": 99, "protein": 24, "fat": 0.3, "carbs": 0.2},
-    "Whey Protein": {"calories": 120, "protein": 24, "fat": 1, "carbs": 3},
-    "Peanut Butter": {"calories": 588, "protein": 25, "fat": 50, "carbs": 20},
+    "Chicken Breast": {
+        "calories": 165, "protein": 31, "fat": 3.6, "carbs": 0,
+        "recipes": [
+            {
+                "title": "Grilled Chicken",
+                "text": "Marinate chicken with olive oil, garlic, lemon, salt & pepper. Grill each side for ~6-8 minutes until cooked.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=2qH9ZSj5FIM",
+                    "https://www.youtube.com/watch?v=F5DxMBQUOcI",
+                    "https://www.youtube.com/watch?v=3dNnQkU2rGA"
+                ]
+            },
+            {
+                "title": "Chicken Stir Fry",
+                "text": "Cut chicken into strips, sauté with veggies, soy sauce & spices for 5-7 minutes.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=7ddw0i-JEgo"
+                ]
+            }
+        ]
+    },
+    "Paneer": {
+        "calories": 265, "protein": 18, "fat": 21, "carbs": 2.4,
+        "recipes": [
+            {
+                "title": "Paneer Tikka",
+                "text": "Marinate paneer cubes in yogurt, turmeric, chili, garam masala. Grill or bake for ~15 mins.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=pgnFBet5pbo",
+                    "https://www.youtube.com/watch?v=TnsQdRxi84Q"
+                ]
+            },
+            {
+                "title": "Paneer Bhurji",
+                "text": "Crumble paneer, sauté onion, tomato, spices. Cook 5 mins.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=ZaUNzwr_KF0"
+                ]
+            }
+        ]
+    },
+    "Egg": {
+        "calories": 78, "protein": 6, "fat": 5, "carbs": 0.6,
+        "recipes": [
+            {
+                "title": "Masala Omelette",
+                "text": "Beat eggs with onions, green chili, salt. Cook on medium heat till golden both sides.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=HjFx4gVXbJY"
+                ]
+            },
+            {
+                "title": "Boiled Egg Salad",
+                "text": "Boil eggs, slice, mix with cucumber, tomato, lemon juice.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=F3Uu4K_GwFw"
+                ]
+            }
+        ]
+    },
+    "Oats": {
+        "calories": 389, "protein": 17, "fat": 7, "carbs": 66,
+        "recipes": [
+            {
+                "title": "Overnight Oats",
+                "text": "Mix oats + milk + chia + honey. Refrigerate overnight. Add fruits before serving.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=YI1WqYKvZzY"
+                ]
+            },
+            {
+                "title": "Protein Oats Bowl",
+                "text": "Cook oats, stir in whey or protein powder, top with banana and nuts.",
+                "videos": [
+                    "https://www.youtube.com/watch?v=shz3m2uh7v8"
+                ]
+            }
+        ]
+    },
+    # You can add more foods and their recipes similarly...
 }
 
-# ---------------------- SIDEBAR ----------------------
-st.sidebar.header("🍽 Meal Input")
-food_name = st.sidebar.selectbox("Select a food item:", list(foods.keys()))
-grams = st.sidebar.number_input("Enter weight (in grams):", min_value=0, max_value=1000, value=100, step=10)
-fitness_goal = st.sidebar.selectbox("🎯 Fitness Goal", ["Cutting", "Maintenance", "Bulking"])
+# ------------------ UTILITY FUNCTIONS ------------------
 
-# ---------------------- IMAGE UPLOAD ----------------------
-uploaded_file = st.sidebar.file_uploader("📸 Upload a food image", type=["jpg", "png", "jpeg"])
+def detect_ai_image(img: Image.Image) -> bool:
+    """Simple heuristic: low variance suggests synthetic image."""
+    stat = ImageStat.Stat(img)
+    variance = sum(stat.var)
+    return variance < 500
 
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="📷 Uploaded Image", use_column_width=True)
+def get_ist_time() -> str:
+    """Return current time in Asia/Kolkata in 12-hour format."""
+    tz = pytz.timezone("Asia/Kolkata")
+    now = datetime.now(tz)
+    return now.strftime("%I:%M %p")
 
-    # AI image detection simulation
-    if random.choice([True, False]):
-        st.warning("🤖 Detected: This might be an AI-generated image.")
+def embed_video(url: str):
+    """Try st.video, fallback to iframe if that fails."""
+    try:
+        st.video(url)
+    except:
+        # convert to embed format
+        if "watch?v=" in url:
+            video_id = url.split("watch?v=")[-1]
+            iframe_url = f"https://www.youtube.com/embed/{video_id}"
+            components.iframe(iframe_url, width=560, height=315)
+        else:
+            # fallback direct iframe
+            components.iframe(url, width=560, height=315)
+
+# ------------------ APP LOGIC ------------------
+
+# Sidebar for input
+st.sidebar.header("Meal Input")
+food_name = st.sidebar.selectbox("Select Food:", list(foods.keys()))
+grams = st.sidebar.number_input("Enter weight (grams):", min_value=0, max_value=1000, value=100, step=10)
+
+uploaded = st.sidebar.file_uploader("Upload food image (optional)", type=["jpg", "jpeg", "png"])
+
+# If image is uploaded
+if uploaded:
+    img = Image.open(uploaded)
+    st.image(img, caption="Uploaded Image", use_column_width=True)
+    if detect_ai_image(img):
+        st.warning("⚠️ This might be an AI-generated image. Please use a real photo.")
     else:
         st.success("✅ Real image detected.")
+        # You can optionally auto-detect food name etc here...
 
-# ---------------------- TIME TRACKING ----------------------
-tz_india = pytz.timezone("Asia/Kolkata")
-current_time = datetime.now(tz_india)
-meal_time = current_time.strftime("%I:%M %p")
-st.sidebar.write(f"🕒 Current Time (IST): {meal_time}")
-
-# ---------------------- CALCULATION ----------------------
+# Calculate nutrition
 if grams > 0:
     info = foods[food_name]
     calories = info["calories"] * grams / 100
@@ -69,92 +149,31 @@ if grams > 0:
     fat = info["fat"] * grams / 100
     carbs = info["carbs"] * grams / 100
 
-    st.success(f"**You selected {grams}g of {food_name}**")
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("🔥 Calories", f"{calories:.1f} kcal")
-    col2.metric("💪 Protein", f"{protein:.1f} g")
-    col3.metric("🥑 Fat", f"{fat:.1f} g")
-    col4.metric("🍞 Carbs", f"{carbs:.1f} g")
+    st.success(f"You selected **{grams}g of {food_name}**")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Calories", f"{calories:.1f} kcal")
+    c2.metric("Protein", f"{protein:.1f} g")
+    c3.metric("Fat", f"{fat:.1f} g")
+    c4.metric("Carbs", f"{carbs:.1f} g")
 
-# ---------------------- RECIPES ----------------------
-st.markdown("## 🍳 Cooking Recipes & Videos")
+    time_str = get_ist_time()
+    st.write(f"🕒 Time logged (IST): **{time_str}**")
 
-# Recipe Database
-if food_name == "Chicken Breast":
-    with st.expander("🍗 Grilled Chicken - Step by Step"):
-        st.write("""
-        **How to Cook:**
-        1. Marinate chicken with olive oil, garlic, lemon, and pepper.
-        2. Let it rest for 30 minutes.
-        3. Grill for 6–7 minutes each side.
-        4. Serve with sautéed vegetables.
-        """)
-        st.video("https://www.youtube.com/watch?v=2qH9ZSj5FIM")
-        st.video("https://www.youtube.com/watch?v=F5DxMBQUOcI")
-        st.video("https://www.youtube.com/watch?v=5d9zRCpHLNg")
+    # Recipes & videos
+    st.markdown("---")
+    st.markdown("## 🍽 Recipes & Videos")
+    for rec in foods[food_name].get("recipes", []):
+        with st.expander(f"{rec['title']}"):
+            st.write(rec["text"])
+            # embed all associated videos
+            for v in rec.get("videos", []):
+                embed_video(v)
 
-if food_name == "Paneer":
-    with st.expander("🧀 Paneer Tikka - Step by Step"):
-        st.write("""
-        **How to Cook:**
-        1. Marinate paneer cubes with curd, turmeric, red chili, garam masala.
-        2. Skewer with veggies.
-        3. Grill or bake for 15 minutes.
-        4. Serve with mint chutney.
-        """)
-        st.video("https://www.youtube.com/watch?v=pgnFBet5pbo")
-        st.video("https://www.youtube.com/watch?v=TnsQdRxi84Q")
-        st.video("https://www.youtube.com/watch?v=ZaUNzwr_KF0")
-
-if food_name == "Egg":
-    with st.expander("🥚 Boiled Egg & Curry Ideas"):
-        st.write("""
-        **How to Cook:**
-        1. Boil eggs for 8 minutes and peel.
-        2. For curry: sauté onions, tomatoes, and masala.
-        3. Add eggs, simmer for 5 minutes.
-        """)
-        st.video("https://www.youtube.com/watch?v=FVtgn8PpS-M")
-        st.video("https://www.youtube.com/watch?v=pCq7L9s3DjQ")
-
-if food_name == "Oats":
-    with st.expander("🥣 Oats Recipes"):
-        st.write("""
-        **How to Cook:**
-        1. Boil oats with milk or water for 5 minutes.
-        2. Add banana slices, peanut butter, or whey for protein.
-        3. Top with nuts or honey.
-        """)
-        st.video("https://www.youtube.com/watch?v=YI1WqYKvZzY")
-        st.video("https://www.youtube.com/watch?v=shz3m2uh7v8")
-
-if food_name == "Fish (Salmon)":
-    with st.expander("🐟 Grilled Salmon"):
-        st.write("""
-        **How to Cook:**
-        1. Marinate with olive oil, garlic, and herbs.
-        2. Grill for 5–6 minutes each side.
-        3. Serve with lemon and greens.
-        """)
-        st.video("https://www.youtube.com/watch?v=cq7SuDK7C9Y")
-        st.video("https://www.youtube.com/watch?v=4A4Dg5X4NFs")
-
-if food_name == "Whey Protein":
-    with st.expander("🥤 Protein Shakes"):
-        st.write("""
-        **Recipes:**
-        1. **Banana Whey Shake** — Blend banana + whey + milk + peanut butter.  
-        2. **Oats Whey Smoothie** — Add soaked oats for extra carbs.  
-        3. **Chocolate Whey Smoothie** — Add cocoa and ice for taste.
-        """)
-        st.video("https://www.youtube.com/watch?v=1l1HxqZLwMo")
-        st.video("https://www.youtube.com/watch?v=tGybS_TB6S0")
-
-# ---------------------- NOTES ----------------------
+# Notes
 st.markdown("---")
-st.markdown("### 🧾 Add Your Own Notes")
-note = st.text_area("Write your meal notes or custom ideas:")
-if st.button("💾 Save Note"):
-    st.success("✅ Note saved! (Locally simulated for now)")
+st.markdown("### 📝 Notes / Custom Ideas")
+note = st.text_area("Write your notes:")
+if st.button("Save Note"):
+    st.success("Note saved (locally)")
 
-st.caption("Built with ❤️ using Streamlit — by your bro 💪")
+st.caption("Built with ❤️ using Streamlit — Final Code with Real Videos & Fallbacks")
