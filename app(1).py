@@ -7,10 +7,10 @@ import random
 # ----------------------------
 # PAGE CONFIG
 # ----------------------------
-st.set_page_config(page_title="🥗 Smart Nutrition Tracker v3.5", layout="wide")
+st.set_page_config(page_title="🥗 Smart Nutrition Tracker v3.6", layout="wide")
 
-st.title("🥦 Smart Nutrition Tracker v3.5")
-st.markdown("### Track your meals, nutrition & progress like a pro — powered by AI + real cooking guides 🍳")
+st.title("🥦 Smart Nutrition Tracker v3.6")
+st.markdown("### Track your meals, nutrition, and progress — with real recipes 🍳")
 
 # ----------------------------
 # FOOD DATABASE
@@ -66,95 +66,143 @@ if uploaded_file:
     st.info(f"🕒 Meal recorded at: **{current_time} IST**")
 
 # ----------------------------
-# NUTRITION CALCULATION
+# SUBMIT BUTTON
 # ----------------------------
-if grams > 0:
+submitted = st.sidebar.button("✅ Submit Meal")
+
+if submitted and grams > 0:
     info = foods[food_name]
     calories = info["calories"] * grams / 100
     protein = info["protein"] * grams / 100
     fat = info["fat"] * grams / 100
     carbs = info["carbs"] * grams / 100
 
-    # Adjust calories based on fitness goal
     if goal == "Cutting":
         calories *= 0.9
     elif goal == "Bulking":
         calories *= 1.1
 
-    st.success(f"**{grams}g of {food_name} ({goal} mode)**")
+    st.success(f"**{grams}g of {food_name} ({goal} mode)** submitted successfully!")
+    st.write("Here’s your nutritional breakdown:")
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("🔥 Calories", f"{calories:.1f} kcal")
     col2.metric("💪 Protein", f"{protein:.1f} g")
     col3.metric("🥑 Fat", f"{fat:.1f} g")
     col4.metric("🍞 Carbs", f"{carbs:.1f} g")
-
-else:
-    st.info("👈 Start by selecting a food and entering its weight.")
+elif submitted:
+    st.warning("⚠️ Please enter a valid food weight before submitting.")
 
 # ----------------------------
-# RECIPES + VIDEOS
+# RECIPES + VIDEOS (DETAILED)
 # ----------------------------
 st.markdown("---")
-st.subheader(f"🍳 Recipes & Cooking Guides for {food_name}")
+st.subheader(f"🍳 Detailed Recipes & Cooking Guide for {food_name}")
 
 if food_name == "Chicken Breast":
-    with st.expander("🔥 Grilled Chicken Recipe"):
+    with st.expander("🔥 Grilled Chicken Breast Recipe"):
         st.write("""
         **Ingredients:**
         - 200g chicken breast
-        - Olive oil, salt, pepper, lemon juice, garlic
+        - 1 tbsp olive oil
+        - 1 tsp garlic paste
+        - 1 tsp lemon juice
+        - Salt, pepper, chili flakes to taste
 
         **Steps:**
-        1. Marinate chicken with ingredients for 30 minutes.
-        2. Preheat grill pan and cook both sides for ~6-7 minutes.
-        3. Rest for 2 minutes and serve hot with veggies.
+        1. Clean and pat dry the chicken.
+        2. Mix olive oil, garlic, lemon juice, salt, and pepper.
+        3. Marinate chicken for at least 30 minutes.
+        4. Heat grill or non-stick pan and cook both sides 6–7 minutes until golden.
+        5. Let it rest for 2 minutes before slicing.
         """)
         st.video("https://www.youtube.com/watch?v=F5DxMBQUOcI")
-        st.video("https://www.youtube.com/watch?v=m25_qh1a5qI")
 
 elif food_name == "Paneer":
     with st.expander("🧀 Paneer Tikka Masala"):
         st.write("""
-        **Ingredients:** Paneer cubes, yogurt, masala, onion, tomato gravy.  
-        **Steps:** Marinate → Grill → Mix with gravy → Serve with roti.
+        **Ingredients:**
+        - 200g paneer cubes
+        - 2 tbsp yogurt
+        - 1 tsp ginger-garlic paste
+        - 1 tsp red chili, turmeric, garam masala
+        - 1 onion, 1 tomato, and coriander leaves
+
+        **Steps:**
+        1. Marinate paneer in yogurt and spices for 30 mins.
+        2. Grill or roast till golden brown.
+        3. In another pan, sauté onion and tomato till soft.
+        4. Add the paneer to this gravy and simmer 5 minutes.
+        5. Garnish with coriander and serve hot.
         """)
         st.video("https://www.youtube.com/watch?v=pgnFBet5pbo")
-        st.video("https://www.youtube.com/watch?v=ZaUNzwr_KF0")
 
 elif food_name == "Oats":
-    with st.expander("🥣 Protein Oats Bowl"):
+    with st.expander("🥣 Protein Oats Breakfast Bowl"):
         st.write("""
-        - Cook oats in milk or water.  
-        - Add banana slices, almonds, and a scoop of whey.  
-        - Stir and top with honey for energy.
+        **Ingredients:**
+        - 1/2 cup oats
+        - 1 cup milk
+        - 1 banana, 5 almonds
+        - 1 scoop whey protein
+        - Honey (optional)
+
+        **Steps:**
+        1. Cook oats in milk for 5 minutes.
+        2. Add banana slices, almonds, and honey.
+        3. Mix whey protein once cooled slightly.
+        4. Stir and enjoy warm or chilled.
         """)
         st.video("https://www.youtube.com/watch?v=E6FEtUPcT2E")
 
 elif food_name == "Boiled Egg":
-    with st.expander("🥚 Egg Curry"):
+    with st.expander("🥚 Simple Egg Curry"):
         st.write("""
-        1. Boil eggs and peel.  
-        2. Sauté onion, tomato, and spices.  
-        3. Add eggs and simmer 5 min.
+        **Ingredients:**
+        - 3 boiled eggs
+        - 1 onion, 1 tomato
+        - 1 tsp garam masala, 1 tsp chili powder
+        - Salt, oil, coriander
+
+        **Steps:**
+        1. Sauté onions till brown.
+        2. Add tomato, chili powder, and masala.
+        3. Add 1/4 cup water and mix well.
+        4. Add eggs, cook 5 mins, and garnish with coriander.
         """)
         st.video("https://www.youtube.com/watch?v=dxlW2b-Nckc")
 
-elif food_name == "Whey Protein Shake":
-    with st.expander("🥤 Protein Smoothie"):
-        st.write("""
-        Blend 1 scoop whey, 1 banana, peanut butter & milk.  
-        Great post-workout drink!
-        """)
-        st.video("https://www.youtube.com/watch?v=1rZJ1b8XgS4")
-
 elif food_name == "Grilled Fish":
-    with st.expander("🐟 Spicy Fish Curry"):
+    with st.expander("🐟 Spicy Grilled Fish"):
         st.write("""
-        - Marinate fish with turmeric, salt, and chili.  
-        - Shallow fry and add to coconut gravy.  
-        - Cook 10 mins and garnish with coriander.
+        **Ingredients:**
+        - 150g fish fillet
+        - 1 tsp turmeric, chili powder, lemon juice
+        - 1 tbsp oil, salt to taste
+
+        **Steps:**
+        1. Marinate fish with spices and lemon for 15 mins.
+        2. Heat pan and drizzle oil.
+        3. Cook fish 3–4 mins per side till crisp golden.
+        4. Serve with lemon wedge and salad.
         """)
         st.video("https://www.youtube.com/watch?v=w0Dqj9GCVzA")
+
+elif food_name == "Whey Protein Shake":
+    with st.expander("🥤 High Protein Smoothie"):
+        st.write("""
+        **Ingredients:**
+        - 1 scoop whey protein
+        - 1 banana
+        - 1 tbsp peanut butter
+        - 1 cup milk or water
+        - Ice cubes
+
+        **Steps:**
+        1. Add all ingredients to blender.
+        2. Blend until smooth and creamy.
+        3. Drink immediately after workout for recovery.
+        """)
+        st.video("https://www.youtube.com/watch?v=1rZJ1b8XgS4")
 
 # ----------------------------
 # NOTES
@@ -163,6 +211,6 @@ st.markdown("---")
 with st.expander("🧾 Add Meal Notes"):
     note = st.text_area("Write about this meal (taste, timing, macros, etc.):")
     if st.button("💾 Save Note"):
-        st.success("Note saved! (In real app, this can store locally or cloud.)")
+        st.success("Note saved! (In a full app, this would store locally or on the cloud.)")
 
-st.caption("Built with ❤️ using Streamlit — Smart Nutrition Tracker v3.5")
+st.caption("Built with ❤️ using Streamlit — Smart Nutrition Tracker v3.6")
