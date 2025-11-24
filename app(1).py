@@ -2,134 +2,120 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ---------- APP CONFIG ----------
-st.set_page_config(page_title="💪 Smart Nutrition Tracker", layout="wide")
-st.title("🏋️‍♂️ Smart Nutrition Tracker – Ultimate Gym Edition")
+# -----------------------------
+# Nutrition Database
+# per 100g unless specified
+# -----------------------------
+FOODS = {
+    "Chicken Breast": {"protein": 31, "carbs": 0, "fat": 3.6, "calories": 165},
+    "Egg (per 1 egg)": {"protein": 6, "carbs": 0.6, "fat": 5.3, "calories": 75},
+    "Rice (Cooked)": {"protein": 2.7, "carbs": 28, "fat": 0.3, "calories": 130},
+    "Roti": {"protein": 3, "carbs": 15, "fat": 3, "calories": 120},
+    "Paneer": {"protein": 18, "carbs": 1.2, "fat": 20, "calories": 265},
+    "Oats": {"protein": 17, "carbs": 66, "fat": 7, "calories": 389},
+    "Banana": {"protein": 1.3, "carbs": 27, "fat": 0.3, "calories": 105}
+}
 
-# ---------- TIME (IST 12hr) ----------
-ist = pytz.timezone("Asia/Kolkata")
-st.sidebar.write("🕒 Current Time (IST): **{}**".format(datetime.now(ist).strftime("%I:%M %p")))
+# Timezone for IST
+IST = pytz.timezone("Asia/Kolkata")
+current_time = datetime.now(IST).strftime("%I:%M %p")
 
-# ---------- SESSION STATE ----------
-if "submitted" not in st.session_state:
-    st.session_state.submitted = False
-if "foods" not in st.session_state:
-    st.session_state.foods = {
-        "Chicken Breast": {"cal": 165, "pro": 31, "fat": 3.6, "carb": 0},
-        "Paneer": {"cal": 265, "pro": 18, "fat": 21, "carb": 2.4},
-        "Egg": {"cal": 78, "pro": 6, "fat": 5, "carb": 0.6},
-        "Oats": {"cal": 389, "pro": 17, "fat": 7, "carb": 66},
-        "Fish": {"cal": 206, "pro": 22, "fat": 12, "carb": 0},
-        "Protein Shake": {"cal": 120, "pro": 24, "fat": 1, "carb": 3},
-    }
-if "last_meal" not in st.session_state:
-    st.session_state.last_meal = None
+# Session storage for chat
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-foods = st.session_state.foods
+# -----------------------------
+# 🏋️ UI Design
+# -----------------------------
+st.set_page_config(page_title="Smart Nutrition Tracker", layout="wide")
 
-# ---------- SIDEBAR: SELECT EXISTING FOOD OR ADD NEW ----------
-st.sidebar.header("🍛 Select Your Meal")
-choice = st.sidebar.radio("Choose Option", ["Select Food", "➕ Add New Food"])
+with st.sidebar:
+    st.markdown("🕒 **Current Time (IST):** " + current_time)
+    st.title("🍽 Select Your Meal")
 
-if choice == "➕ Add New Food":
-    st.sidebar.subheader("Add Food Nutrition per 100g")
-    new_name = st.sidebar.text_input("Food Name")
-    cal = st.sidebar.number_input("Calories", 0.0, 2000.0, 0.0, 1.0)
-    pro = st.sidebar.number_input("Protein", 0.0, 200.0, 0.0, 0.1)
-    fat = st.sidebar.number_input("Fat", 0.0, 200.0, 0.0, 0.1)
-    carb = st.sidebar.number_input("Carbs", 0.0, 200.0, 0.0, 0.1)
+    food = st.selectbox("Food", list(FOODS.keys()))
 
-    if st.sidebar.button("💾 Save Food"):
-        if new_name != "" and cal > 0:
-            st.session_state.foods[new_name] = {"cal": cal, "pro": pro, "fat": fat, "carb": carb}
-            st.sidebar.success(f"{new_name} added successfully!")
-        else:
-            st.sidebar.error("Enter valid food and calories.")
-
-else:
-    food = st.sidebar.selectbox("Food", list(foods.keys()))
-
-    if food == "Egg":
-        egg_count = st.sidebar.number_input("Number of Eggs", 0, 20, 1, 1)
+    if "Egg" in food:
+        qty = st.number_input("Number of Eggs", min_value=1, value=2)
         grams = None
     else:
-        grams = st.sidebar.number_input("Grams", 0, 1000, 100, 10)
-        egg_count = None
+        grams = st.number_input("Grams", min_value=10, step=10, value=100)
+        qty = None
 
-    goal = st.sidebar.radio("Goal", ["Cutting", "Maintenance", "Bulking"])
-    if st.sidebar.button("✅ Submit"):
-        st.session_state.submitted = True
+    goal = st.radio("Goal", ["Cutting", "Maintenance", "Bulking"])
 
-# ---------- RESULTS ----------
-if st.session_state.submitted and choice == "Select Food":
-    data = foods[food]
+    uploaded_photo = st.file_uploader("📸 Upload meal photo", type=["png", "jpg", "jpeg"])
 
-    if food == "Egg":
-        total_cal = data["cal"] * egg_count
-        total_pro = data["pro"] * egg_count
-        total_fat = data["fat"] * egg_count
-        total_carb = data["carb"] * egg_count
-        st.session_state.last_meal = (food, f"{egg_count} Eggs", total_cal, total_pro)
-        st.success(f"{egg_count} Eggs — **{goal} Mode**")
+    if st.button("✔ Submit"):
+        st.success("Meal Added Successfully! Scroll right to view analysis")
+
+# -----------------------------
+# Main Title Page
+# -----------------------------
+st.markdown("<h1 style='text-align: center;'>💪 Smart Nutrition Tracker – Ultimate Gym Edition</h1>", unsafe_allow_html=True)
+st.subheader("Built with ❤️ by Team Project Bro")
+
+# -----------------------------
+# Nutrition Calculation
+# -----------------------------
+if grams or qty:
+    st.markdown("### 🧮 Meal Overview")
+
+    data = FOODS[food]
+
+    if qty:
+        multiplier = qty  # eggs are per piece
     else:
-        total_cal = data["cal"] * grams / 100
-        total_pro = data["pro"] * grams / 100
-        total_fat = data["fat"] * grams / 100
-        total_carb = data["carb"] * grams / 100
-        st.session_state.last_meal = (food, f"{grams} g", total_cal, total_pro)
-        st.success(f"{grams} g of {food} — **{goal} Mode**")
+        multiplier = grams / 100  # others per 100g
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("🔥 Calories", f"{total_cal:.1f}")
-    c2.metric("💪 Protein", f"{total_pro:.1f} g")
-    c3.metric("🥑 Fat", f"{total_fat:.1f} g")
-    c4.metric("🍞 Carbs", f"{total_carb:.1f} g")
+    protein = round(data["protein"] * multiplier, 1)
+    carbs = round(data["carbs"] * multiplier, 1)
+    fat = round(data["fat"] * multiplier, 1)
+    calories = round(data["calories"] * multiplier, 1)
 
+    st.write(f"🍗 **{food}**")
+    if qty:
+        st.write(f"🥚 Quantity: {qty} eggs")
+    else:
+        st.write(f"⚖️ Weight: {grams}g")
+
+    st.metric("Protein", f"{protein} g")
+    st.metric("Carbs", f"{carbs} g")
+    st.metric("Fat", f"{fat} g")
+    st.metric("Calories", f"{calories} kcal")
+
+# -----------------------------
+# 🤖 Nutrition Chatbot
+# -----------------------------
 st.markdown("---")
+st.markdown("### 🤖 Nutrition Chat Assistant")
 
-# ---------- CHATBOT ----------
-st.subheader("🤖 AI Nutrition Chatbot")
+user_msg = st.text_input("Ask me anything about your food or diet:")
 
-def chatbot_reply(msg):
-    msg = msg.lower()
+if user_msg:
+    st.session_state.chat_history.append(("You", user_msg))
 
-    # last meal data
-    last = st.session_state.last_meal
+    bot_reply = f"Based on your goal **{goal}**: \n\n"
 
-    if "last" in msg and last:
-        food, qty, cal, pro = last
-        return f"Your last meal was **{qty} of {food}** providing **{cal:.1f} calories** and **{pro:.1f} g protein**."
+    if "protein" in user_msg.lower():
+        bot_reply += "💡 Aim 1.8–2.2g protein per kg body weight daily.\n"
+    if "egg" in user_msg.lower():
+        bot_reply += "🥚 1 egg ≈ 6g protein, 75 calories.\n"
+    if "chicken" in user_msg.lower():
+        bot_reply += "🍗 100g chicken ≈ 31g protein.\n"
 
-    if "protein" in msg:
-        return "To build muscle, try to target 1.8 – 2.2 g protein per kg body weight per day."
-
-    if "calorie" in msg:
-        return "For cutting choose calorie deficit. For bulking choose 300–400 kcal surplus."
-
-    if "what to eat" in msg or "suggest" in msg:
-        return "Good choices now: Chicken Breast, Eggs, Fish, Paneer, Oats & Protein Shake."
-
-    if "hello" in msg or "hi" in msg:
-        return "Hello chief! 💪 Tell me what you ate or ask anything about nutrition."
-
-    return "Got it! 💡 Tell me your meal or nutrition question — I'm here to guide you."
-
-# message input
-user_msg = st.text_input("💬 Ask anything about food & nutrition:")
-
-if st.button("Send"):
-    if user_msg.strip() != "":
-        st.session_state.chat_history.append(("user", user_msg))
-        bot = chatbot_reply(user_msg)
-        st.session_state.chat_history.append(("bot", bot))
-
-# chatbox display
-for sender, text in st.session_state.chat_history:
-    if sender == "user":
-        st.markdown(f"🧍 **You:** {text}")
+    if goal == "Cutting":
+        bot_reply += "🔥 For cutting: Increase protein & reduce carbs after 6 PM."
+    elif goal == "Bulking":
+        bot_reply += "🍚 For bulking: Add rice/pasta & milk for calorie boost."
     else:
-        st.markdown(f"🤖 **Bot:** {text}")
+        bot_reply += "⚖️ Balanced macro intake is key for maintenance."
 
-st.caption("Built with ❤️ | Team Project Bro")
+    st.session_state.chat_history.append(("Bot", bot_reply))
+
+# Show chat messages
+for role, msg in st.session_state.chat_history:
+    if role == "You":
+        st.markdown(f"🧑 **{role}:** {msg}")
+    else:
+        st.markdown(f"🤖 **{role}:** {msg}")
