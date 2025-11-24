@@ -1,7 +1,6 @@
 import streamlit as st
 from datetime import datetime
 import pytz
-
 # -----------------------------
 # Nutrition Database
 # per 100g unless specified
